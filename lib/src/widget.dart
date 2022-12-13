@@ -11,12 +11,14 @@ typedef ResponsiveBuilderType = Widget Function(
 ///
 /// Usage: Wrap MaterialApp with this widget
 class ResponsiveSizer extends StatelessWidget {
-  const ResponsiveSizer({
-    Key? key,
-    required this.builder,
-    this.maxMobileWidth = 599,
-    this.maxTabletWidth,
-  }) : super(key: key);
+  const ResponsiveSizer(
+      {Key? key,
+      required this.builder,
+      this.maxMobileWidth = 599,
+      this.maxTabletWidth = 1024,
+      this.maxDesktopWidth = 1920,
+      this.maxRetinaWidth = 2460})
+      : super(key: key);
 
   /// Builds the widget whenever the orientation changes
   final ResponsiveBuilderType builder;
@@ -28,27 +30,26 @@ class ResponsiveSizer extends StatelessWidget {
   /// to `maxMobileWidth`, the device is in a mobile device
   final double maxMobileWidth;
 
-  /// By default, the `ScreenType` can only be mobile or tablet. If this is set,
-  /// the `ScreenType` can be desktop as well
-  ///
   /// This is the breakpoint used to determine whether the device is
   /// a tablet or a desktop.
   ///
   /// If the `MediaQuery`'s width **in portrait mode** is
   /// less than or equal to `maxTabletWidth`, the device is in a tablet device
-  final double? maxTabletWidth;
+  final double maxTabletWidth;
+
+  /// This is the breakpoint used to determine whether the device screen type is desktop
+
+  final double maxDesktopWidth;
+
+  /// This is the breakpoint used to determine whether the device screen type is retina
+  final double maxRetinaWidth;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       return OrientationBuilder(builder: (context, orientation) {
-        Device.setScreenSize(
-          context,
-          constraints,
-          orientation,
-          maxMobileWidth,
-          maxTabletWidth,
-        );
+        Device.setScreenSize(context, constraints, orientation, maxMobileWidth,
+            maxTabletWidth, maxDesktopWidth, maxRetinaWidth);
 
         if (constraints.maxWidth == 0 || constraints.maxHeight == 0) {
           return const SizedBox();

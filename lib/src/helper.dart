@@ -8,7 +8,7 @@ enum DeviceType { android, ios, fuchsia, web, windows, mac, linux }
 /// Type of Screen
 ///
 /// This can either be mobile or tablet
-enum ScreenType { mobile, tablet, desktop }
+enum ScreenType { mobile, tablet, desktop, retina, res4k }
 
 class Device {
   /// Device's BoxConstraints
@@ -38,12 +38,13 @@ class Device {
   /// Sets the Screen's size and Device's `Orientation`,
   /// `BoxConstraints`, `Height`, and `Width`
   static void setScreenSize(
-    BuildContext context,
-    BoxConstraints constraints,
-    Orientation currentOrientation,
-    double maxMobileWidth, [
-    double? maxTabletWidth,
-  ]) {
+      BuildContext context,
+      BoxConstraints constraints,
+      Orientation currentOrientation,
+      double maxMobileWidth,
+      double maxTabletWidth,
+      double maxDesktopWidth,
+      double maxRetinaWidth) {
     // Sets boxconstraints and orientation
     boxConstraints = constraints;
     orientation = currentOrientation;
@@ -83,7 +84,19 @@ class Device {
     }
 
     // Sets ScreenType
-    if ((orientation == Orientation.portrait && width <= maxMobileWidth) ||
+    if (width > maxRetinaWidth) {
+      screenType = ScreenType.res4k;
+    } else if (width > maxDesktopWidth)
+      screenType = ScreenType.retina;
+    else if (width > maxTabletWidth)
+      screenType = ScreenType.desktop;
+    else if ((orientation == Orientation.portrait && width > maxMobileWidth) ||
+        (orientation == Orientation.landscape && height > maxMobileWidth))
+      screenType = ScreenType.tablet;
+    else
+      screenType = ScreenType.mobile;
+
+    /*if ((orientation == Orientation.portrait && width <= maxMobileWidth) ||
         (orientation == Orientation.landscape && height <= maxMobileWidth)) {
       screenType = ScreenType.mobile;
     } else if (maxTabletWidth == null ||
@@ -92,7 +105,7 @@ class Device {
       screenType = ScreenType.tablet;
     } else {
       screenType = ScreenType.desktop;
-    }
+    }*/
   }
 
   /// This allows a value of type T or T?
